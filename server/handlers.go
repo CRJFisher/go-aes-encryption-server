@@ -16,9 +16,11 @@ func ObjRetrieve(w http.ResponseWriter, r *http.Request) {
 	}
 	credential := DecryptionRequest{ID: i, Key: r.URL.Query().Get("Key")}
 
-	dataFromStore := RepoFindObj(credential.ID)
+	// dataFromStore := RepoFindObj(credential.ID)
+	dataFromStore := GetEncryptedFromDB(credential.ID)
 
 	decryptedData, err := Decrypt(dataFromStore.EncryptedContent, []byte(credential.Key))
+	// decryptedData := "It's fine" + dataFromStore.EncryptedContent
 	if err != nil {
 		panic(err)
 	}
@@ -53,7 +55,8 @@ func ObjCreate(w http.ResponseWriter, r *http.Request) {
 	encrypted := Encrypted{data.ID, ciphertext}
 
 	//Store it
-	RepoCreateObj(encrypted)
+	// RepoCreateObj(encrypted)
+	CreateEncryptedInDB(encrypted)
 
 	//Return the key and reference ID
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")

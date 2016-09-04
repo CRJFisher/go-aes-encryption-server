@@ -7,9 +7,9 @@ var dataObjs EncryptedData
 // RepoFindObj gets the object with given ID from the database
 func RepoFindObj(ID int) Encrypted {
 
-	for _, t := range dataObjs {
-		if t.ID == ID {
-			return t
+	for _, enc := range dataObjs {
+		if enc.ID == ID {
+			return enc
 		}
 	}
 	// return empty Obj if not found
@@ -17,23 +17,23 @@ func RepoFindObj(ID int) Encrypted {
 }
 
 // RepoCreateObj manages the ID of the object and then stores the object
-func RepoCreateObj(t Encrypted) Encrypted {
+func RepoCreateObj(enc Encrypted) Encrypted {
 
 	//TODO: If the ID already exists, change it so it doesn't collide
 	//----> Implement idAlreadyExists
 
-	if t.ID == 0 {
+	if enc.ID == 0 {
 		currentID++
-		t.ID = currentID
+		enc.ID = currentID
 	}
 
-	dataObjs = append(dataObjs, t)
-	return t
+	dataObjs = append(dataObjs, enc)
+	return enc
 }
 
 func idAlreadyExists(id int) bool {
-	for _, t := range dataObjs {
-		if t.ID == id {
+	for _, enc := range dataObjs {
+		if enc.ID == id {
 			return true
 		}
 	}
