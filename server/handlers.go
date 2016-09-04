@@ -14,18 +14,17 @@ func ObjRetrieve(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		panic(err)
 	}
-	encryptionKey := EncryptionResponse{ID: i, Key: []byte(r.URL.Query().Get("Key"))}
+	credential := DecryptionRequest{ID: i, Key: r.URL.Query().Get("Key")}
 
-	dataFromStore := RepoFindObj(encryptionKey.ID)
+	dataFromStore := RepoFindObj(credential.ID)
 
-	decryptedData, err := Decrypt(dataFromStore.EncryptedContent, dataFromStore.Key)
+	decryptedData, err := Decrypt(dataFromStore.EncryptedContent, []byte(credential.Key))
 	if err != nil {
 		panic(err)
 	}
 
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-	w.WriteHeader(422) // unprocessable entity
-	if err := json.NewEncoder(w).Encode(string(decryptedData[:])); err != nil {
+	if err := json.NewEncoder(w).Encode(UnencryptedRequest{i, decryptedData}); err != nil {
 		panic(err)
 	}
 }
@@ -51,7 +50,7 @@ func ObjCreate(w http.ResponseWriter, r *http.Request) {
 
 	//Encrypt the data
 	ciphertext, key, _ := Encrypt([]byte(data.Content))
-	encrypted := Encrypted{data.ID, ciphertext, key}
+	encrypted := Encrypted{data.ID, ciphertext}
 
 	//Store it
 	RepoCreateObj(encrypted)
@@ -59,7 +58,7 @@ func ObjCreate(w http.ResponseWriter, r *http.Request) {
 	//Return the key
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	w.WriteHeader(http.StatusCreated)
-	if err := json.NewEncoder(w).Encode(EncryptionResponse{encrypted.ID, encrypted.Key}); err != nil {
+	if err := json.NewEncoder(w).Encode(EncryptionResponse{encrypted.ID, key}); err != nil {
 		panic(err)
 	}
 }

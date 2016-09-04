@@ -5,6 +5,7 @@ import (
 	"crypto/cipher"
 	"crypto/rand"
 	"crypto/sha256"
+	"encoding/base64"
 	"fmt"
 	"io"
 )
@@ -12,21 +13,21 @@ import (
 // Encrypt takes plaintext, generates a key,
 // encrypts and authenticates the plaintext,
 // then returns the encrypted message and key
-func Encrypt(plainText []byte) (encrypted []byte, key []byte, err error) {
+func Encrypt(plainText []byte) (cipherTextString string, keyString string, err error) {
 
-	key = make([]byte, 64)
+	key := make([]byte, 64)
 	if _, err := rand.Read(key); err != nil {
-		return nil, nil, err
+		return "", "", err
 	}
 
-	hashedKey := hashTo32Bytes(key)
+	hashedKey := hashTo32Bytes([]byte(base64.URLEncoding.EncodeToString(key)))
 
-	encrypted, err = encryptAES(hashedKey, plainText)
+	encrypted, err := encryptAES(hashedKey, plainText)
 	if err != nil {
-		return nil, nil, err
+		return "", "", err
 	}
 
-	return encrypted, key, nil
+	return base64.URLEncoding.EncodeToString(encrypted), base64.URLEncoding.EncodeToString(key), nil
 }
 
 func encryptAES(key, data []byte) ([]byte, error) {
@@ -56,20 +57,22 @@ func encryptAES(key, data []byte) ([]byte, error) {
 // Decrypt takes the ecrypted message and key,
 // then it decrypts and authenticates,
 // then returns the original plaintext
-func Decrypt(encrypted []byte, key []byte) (plainText []byte, err error) {
+func Decrypt(cryptoText string, key []byte) (plainText string, err error) {
+
+	encrypted, err := base64.URLEncoding.DecodeString(cryptoText)
 
 	if len(encrypted) < aes.BlockSize {
-		return nil, fmt.Errorf("cipherText too short. It decodes to %v bytes but the minimum length is 16", len(encrypted))
+		return "", fmt.Errorf("cipherText too short. It decodes to %v bytes but the minimum length is 16", len(encrypted))
 	}
 
 	hashedKey := hashTo32Bytes(key)
 
 	decrypted, err := decryptAES(hashedKey, encrypted)
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 
-	return decrypted, nil
+	return string(decrypted), nil
 }
 
 func decryptAES(key, data []byte) ([]byte, error) {
