@@ -55,7 +55,7 @@ func ObjCreate(w http.ResponseWriter, r *http.Request) {
 	//Store it
 	RepoCreateObj(encrypted)
 
-	//Return the key
+	//Return the key and reference ID
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	w.WriteHeader(http.StatusCreated)
 	if err := json.NewEncoder(w).Encode(EncryptionResponse{encrypted.ID, key}); err != nil {
