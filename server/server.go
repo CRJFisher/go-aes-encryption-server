@@ -5,10 +5,10 @@ import (
 	"net/http"
 )
 
-func main() {
+// UseRemoteStore toggles the microservice store, defaulting to in-memory store
+var UseRemoteStore = true
 
-	StartDB()
-	defer StopDB()
+func main() {
 
 	router := MuxRouter()
 

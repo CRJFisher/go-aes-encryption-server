@@ -2,8 +2,8 @@ package main
 
 // Encrypted models the object that will be stored on the database
 type Encrypted struct {
-	ID               int
-	EncryptedContent string
+	ID               int    `json:"objId"`
+	EncryptedContent string `json:"content"`
 }
 
 // EncryptionResponse models the data returned after content post success
