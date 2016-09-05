@@ -1,75 +1,34 @@
 # core-interview-test
 
-This repository includes the YOTI Core team interview test, and its resources.
+This repository is a solution to the YOTI Core test
 
-## The YOTI Core test
+## setup
 
-At Yoti we use a [microservice architecture](https://en.wikipedia.org/wiki/Microservices).
-This test asks for the development of a software encryption module to fit this
-architecture.
+#### encryption server
+If you do not want this to store/retrieve data from REST/MongoDB microservice change the 'UseRemoteStore' flag to false
 
-Please implement an `encryption-server` with two endpoints, described below. The
-server's interface may, for the purposes of this test, be anything convenient
-for you: it could be Unix sockets, HTTP, or even pure command line driven.
+Once the repository is downloaded, install the encryption server:
+    In the 'server' folder, run: go install
 
-Use of built-in and third party Go libraries is encouraged, particularly with
-regard to serialising data/messages/commands.
+Then run the server:
+    Make sure there is no process at port 8080
+    Then run: $GOPATH/bin/server
 
-We're happy for the data store to be implemented in any way: it could be an
-in-memory structure (don't worry about memory usage), on-disk, or using a third
-party library/database.
+#### database server
+This requires two mongo packages to compile:
+    Run:     go get gopkg.in/mgo.v2
+    ... and: go get gopkg.in/mgo.v2/bson
 
-### store endpoint
+To install the database server:
+    In the 'database' folder, type: go install
 
-Inputs:
- - data to encrypt (plaintext)
- - an ID (will be used later to retrieve the data)
+To run the database server:
+    Make sure there is no process at port 8082
+    Then run: $GOPATH/bin/database
 
-Actions:
- - generate an AES encryption key
- - encrypt the plaintext data using the generated key
- - store the encrypted data (ciphertext)
+## run the client
+To run the client script:
+    In the client folder, run: go run main.go
 
-Outputs:
- - the key used to encrypt the ciphertext
-
-### retrieve endpoint
-
-Inputs:
- - encryption key
- - ID
-
-Actions:
- - retrieve the encrypted data (ciphertext)
- - decrypt the ciphertext using the provided key
-
-Outputs:
- - the original plaintext
-
-### Go client interface
-
-A client interface has also been provided. Please implement a client which 
-satisfies the interface in order to interact with the above server.
-
-### Extra credits
-
-Optional things for extra credits! Only do these if you wish to spend more
-time on this. We're happy to consider answers with and without these.
-
-1. It would be desirable for the data store key (used internally by
-   `encryption-server`) to be difficult to derive from the original ID provided
-   when storing the data. The intention is to provide an extra layer of
-   protection of user data (hiding any information in the data IDs) if an
-   attacker was able to dump the raw database.
-
-2. Split the storage component out into its own microservice.
-
-### Notes
-
-All work should be committed to a git repository where the commit history can be
-reviewed. github is fine, but we're also happy for a `.tar` or similar of the
-git repository.
-
-Your solution should also be easy to run/verify. To that end please feel free to
-provide any further instructions, documentation, etc on how to go about the
-verification process.
+## notes
+If there are any clarifications needed, please get in touch at: crjfisher@gmail.com
