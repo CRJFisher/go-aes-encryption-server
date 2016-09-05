@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"io"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"strconv"
 
@@ -118,6 +117,6 @@ func ensureIndex(s *mgo.Session) {
 	}
 	err := c.EnsureIndex(index)
 	if err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
 }
